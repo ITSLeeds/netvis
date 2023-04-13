@@ -1,0 +1,47 @@
+---
+output: github_document
+---
+
+<!-- README.md is generated from README.Rmd. Please edit that file -->
+
+```{r, include = FALSE}
+knitr::opts_chunk$set(
+  collapse = TRUE,
+  comment = "#>",
+  fig.path = "man/figures/README-",
+  out.width = "100%"
+)
+```
+
+# netvis
+
+<!-- badges: start -->
+<!-- badges: end -->
+
+The goal of netvis is to ...
+
+## Installation
+
+You can install the development version of netvis from [GitHub](https://github.com/) with:
+
+``` r
+# install.packages("devtools")
+devtools::install_github("ITSLeeds/netvis")
+```
+
+## Example
+
+We'll use a route network dataset from the `stplanr` package to demonstrate network visualisation.
+
+```{r}
+library(tidyverse)
+library(sf)
+routes_example = stplanr::routes_fast_sf
+routes_example$v1 = 1
+routes_example$v2 = 2
+routes_example$v3 = 10
+rnet_example = stplanr::overline(routes_example, attrib = c("v1", "v2", "v3"))
+plot(rnet_example)
+# usethis::use_data(rnet_example)
+```
+

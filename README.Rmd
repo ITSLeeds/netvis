@@ -82,3 +82,62 @@ tmap_save(m2, "maps/m2.html")
 webshot2::webshot("maps/m1.html")
 webshot2::webshot("maps/m2.html")
 ```
+
+There are two problems with line widths in the maps shown above:
+
+- The thinnes lines are too thin
+- The thickest lines are too thick
+
+Given that the maximum width is determined by the `scale` argument, we can solve the first problem by increasing the value of `scale`.
+The second problem can be solved with a multiplier that prevents lines being x times thicker than the thinnest line.
+
+```{r, echo=FALSE}
+maximum_width = 15
+minimum_width_multiplier = 5
+# get 95th percentile of line widths
+combined_values = rnet_central |>
+  sf::st_drop_geometry() |>
+  sapply(function(x) {
+    quantile(x, 0.95)
+  }
+  )
+minimum_value_allowed = max(combined_values) / minimum_width_multiplier
+```
+
+```{r, echo=FALSE, out.width="50%", fig.show="hold"}
+scale_bicycle = maximum_width / (quantile(rnet_central$dutch_slc, 0.95) / quantile(rnet_central$bicycle, 0.95))
+# summary(rnet_central$bicycle)
+rnet_bicycle =   rnet_central |>
+    mutate(lwd = case_when(
+      bicycle < minimum_value_allowed ~ minimum_value_allowed,
+      TRUE ~ bicycle
+    ))
+# summary(rnet_bicycle$lwd)
+m3 = tm_shape(
+  rnet_bicycle
+ ) +
+  tm_lines(
+    lwd = "lwd",
+    scale = scale_bicycle
+  )
+tmap_save(m3, "maps/m3.html")
+# browseURL("maps/m3.html")
+webshot2::webshot("maps/m3.html")
+
+# For the Go Dutch scenario
+scale_dutch = maximum_width
+m4 = tm_shape(
+  rnet_central |>
+    mutate(lwd = case_when(
+      dutch_slc < minimum_value_allowed ~ minimum_value_allowed,
+      TRUE ~ dutch_slc
+    ))
+ ) +
+  tm_lines(
+    lwd = "lwd",
+    scale = scale_dutch
+  )
+tmap_save(m4, "maps/m4.html")
+# browseURL("maps/m4.html")
+webshot2::webshot("maps/m4.html")
+```

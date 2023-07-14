@@ -35,3 +35,15 @@ maximum level of flow in the baseline scenario. We can use this to scale
 the line widths as illustrated below.
 
 <img src="man/figures/README-unnamed-chunk-5-1.png" width="50%" /><img src="man/figures/README-unnamed-chunk-5-2.png" width="50%" />
+
+There are two problems with line widths in the maps shown above:
+
+- The thinnes lines are too thin
+- The thickest lines are too thick
+
+Given that the maximum width is determined by the `scale` argument, we
+can solve the first problem by increasing the value of `scale`. The
+second problem can be solved with a multiplier that prevents lines being
+x times thicker than the thinnest line.
+
+<img src="man/figures/README-unnamed-chunk-7-1.png" width="50%" /><img src="man/figures/README-unnamed-chunk-7-2.png" width="50%" />

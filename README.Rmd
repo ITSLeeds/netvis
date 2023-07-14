@@ -1,5 +1,8 @@
 ---
-output: github_document
+title: netvis
+output:
+  github_document:
+    number_sections: yes
 ---
 
 <!-- README.md is generated from README.Rmd. Please edit that file -->
@@ -16,27 +19,23 @@ knitr::opts_chunk$set(
 library(tidyverse)
 ```
 
-# netvis
-
 <!-- badges: start -->
 <!-- badges: end -->
 
 The goal of this repo is to demonstrate different visualisation techniques for communicating information about transport networks.
 
-<!-- ## Installation
-
-You can install the development version of netvis from [GitHub](https://github.com/) with:
-
--->
-
 ```{r, eval = FALSE, echo=FALSE}
 # install.packages("devtools")
 devtools::install_github("ITSLeeds/netvis")
-``` 
+```
 
-## Example
+# Example data
 
 We'll use a route network dataset from the Propensity to Cycle Tool (PCT) to demonstrate the package. The PCT is a web application that allows users to explore cycling potential across England and Wales. The PCT is available at [www.pct.bike](https://www.pct.bike/).
+
+# Static data visualisation
+
+A simple visualisation of the data in a multi-panel static map is shown below.
 
 ```{r, echo=FALSE}
 rnet_leeds = pct::get_pct_rnet("west-yorkshire")
@@ -48,6 +47,350 @@ central_leeds = zones_leeds |>
   sf::st_union()
 rnet_central = sf::st_intersection(rnet_leeds, central_leeds)
 plot(rnet_central)
-sf::st_write(rnet_central, "test-data/rnet_central.geojson", delete_dsn = TRUE)
+# sf::st_write(rnet_central, "test-data/rnet_central.geojson", delete_dsn = TRUE)
 ```
 
+# Interactive data visualisation with tmap
+
+The `tmap` package provides a simple way to create interactive maps. The code below shows how to create an interactive map of the route network data.
+
+```{r, echo=FALSE}
+m_combined_balanced =
+  # Add border layer to
+  tm_shape(county_projected, name = "County border") +
+  tm_borders() +
+  
+  tm_shape(
+    rnet_balanced %>%
+      top_n(n = segment_count, wt = `Bicycle (Baseline)`) %>% 
+      mutate(lwd = set_min_value(`Bicycle (Baseline)`, multiplier = scale_baseline_balanced))
+  ) +
+  tm_lines(
+    title.col = "Cycle friendliness",
+    legend.col.reverse = TRUE,
+    col = "Quietness",
+    lwd = "lwd",
+    popup.vars = c("Bicycles" = "Bicycle (Baseline)", popup_vars),
+    id = NULL,
+    palette = pal_quietness,
+    scale = scale_baseline_balanced,
+    group = "Baseline",
+    legend.col.show = FALSE,
+    breaks = quietness_breaks) +
+  
+  tm_shape(
+    rnet_balanced %>%
+      top_n(n = segment_count, wt = `Bicycle (Near market)`) %>% 
+      mutate(lwd = set_min_value(`Bicycle (Near market)`, multiplier = scale_near_balanced))
+  ) +
+  tm_lines(
+    title.col = "Cycle friendliness",
+    legend.col.reverse = TRUE,
+    col = "Quietness",
+    lwd = "lwd",
+    popup.vars = c("Bicycles" = "Bicycle (Near market)", popup_vars),
+    id = NULL,
+    palette = pal_quietness,
+    scale = scale_near_balanced,
+    group = "Near Market",
+    legend.col.show = FALSE,
+    breaks = quietness_breaks) +
+  
+  tm_shape(
+    rnet_balanced %>%
+        top_n(n = segment_count, wt = `Bicycle (Climate action plan)`) %>%
+        mutate(lwd = set_min_value(`Bicycle (Climate action plan)`, multiplier = scale_climate_balanced))
+  ) +
+  tm_lines(
+    title.col = "Cycle friendliness",
+    legend.col.reverse = TRUE,
+    col = "Quietness",
+    lwd = "lwd",
+    popup.vars = c("Bicycles" = "Bicycle (Climate action plan)", popup_vars),
+    id = NULL,
+    palette = pal_quietness,
+    scale = scale_climate_balanced,
+    group = "Climate Action Plan",
+    legend.col.show = FALSE,
+    breaks = quietness_breaks) +
+  
+  tm_shape(rnet_balanced %>%
+             top_n(n = segment_count, wt = `Bicycle (Go Dutch)`) %>% 
+             mutate(lwd = set_min_value(`Bicycle (Go Dutch)`, multiplier = scale_go_dutch_balanced))
+  ) +
+  tm_lines(
+    title.col = "Cycle friendliness",
+    legend.col.reverse = TRUE,
+    col = "Quietness",
+    lwd = "lwd",
+    popup.vars = c("Bicycles" = "Bicycle (Go Dutch)", popup_vars),
+    id = NULL,
+    palette = pal_quietness,
+    scale = scale_go_dutch_balanced,
+    group = "Go Dutch",
+    legend.col.show = FALSE,
+    breaks = quietness_breaks) +
+  
+  tm_shape(rnet_balanced %>%
+             top_n(n = segment_count, wt = `Bicycle (Ebike)`) %>% 
+             mutate(lwd = set_min_value(`Bicycle (Ebike)`, multiplier = scale_ebike_balanced))
+  ) +
+  tm_lines(
+    title.col = "Cycle friendliness",
+    legend.col.reverse = TRUE,
+    col = "Quietness",
+    lwd = "lwd",
+    popup.vars = c("Bicycles" = "Bicycle (Ebike)", popup_vars),
+    id = NULL,
+    palette = pal_quietness,
+    scale = scale_ebike_balanced,
+    group = "Ebike",
+    legend.col.show = FALSE,
+    breaks = quietness_breaks) +
+
+  tm_shape(schools_vis, name = "Schools") +
+  tm_dots(size = "total_for_vis",
+          col = "black",
+          border.lwd = 1,
+          border.col = "black",
+          scale = 0.3,
+          alpha = 0.6,
+          popup.vars = c("Official Name"= "Official_Name", "School type" = "school_type", "Number of students"="total"),
+          popup.format = list(total = list(digits = 0)),
+          id = NULL) +
+  
+  tm_basemap(server = basemaps) +
+  tm_add_legend('fill', 
+                col = pal,
+                group = c("Quietest network", "Fastest network"),
+                labels = c("0 to 25", "25 to 50", "50 to 75", "75 to 100"),
+                title="Cycle friendliness")
+
+l_combined_balanced = m_combined_balanced %>%
+  tmap_leaflet(col = "Quietness") %>%
+  leaflet::hideGroup(group = rnet_groups)
+
+# Create combined quietest map -----------------------------------
+m_combined_quietest =
+  # Add border layer to
+  tm_shape(county_projected, name = "County border") +
+  tm_borders() +
+  
+  tm_shape(
+    rnet_quietest %>%
+      top_n(n = segment_count, wt = `Bicycle (Baseline)`) %>% 
+      mutate(lwd = set_min_value(`Bicycle (Baseline)`, multiplier = scale_baseline_quiet))
+    ) +
+  tm_lines(
+    title.col = "Cycle friendliness",
+    legend.col.reverse = TRUE,
+    col = "Quietness",
+    lwd = "lwd",
+    popup.vars = c("Bicycles" = "Bicycle (Baseline)", popup_vars),
+    id = NULL,
+    palette = pal_quietness,
+    scale = scale_baseline_quiet,
+    group = "Baseline",
+    legend.col.show = FALSE,
+    breaks = quietness_breaks) +
+  
+  tm_shape(
+    rnet_quietest %>%
+      top_n(n = segment_count, wt = `Bicycle (Near market)`) %>% 
+      mutate(lwd = set_min_value(`Bicycle (Near market)`, multiplier = scale_near_quiet))
+  ) +
+  tm_lines(
+    title.col = "Cycle friendliness",
+    legend.col.reverse = TRUE,
+    col = "Quietness",
+    lwd = "lwd",
+    popup.vars = c("Bicycles" = "Bicycle (Near market)", popup_vars),
+    id = NULL,
+    palette = pal_quietness,
+    scale = scale_near_quiet,
+    group = "Near Market",
+    legend.col.show = FALSE,
+    breaks = quietness_breaks) +
+
+  tm_shape(
+    rnet_quietest %>%
+      top_n(n = segment_count, wt = `Bicycle (Climate action plan)`) %>%
+      mutate(lwd = set_min_value(`Bicycle (Climate action plan)`, multiplier = scale_climate_quiet))
+  ) +
+  tm_lines(
+    title.col = "Cycle friendliness",
+    legend.col.reverse = TRUE,
+    col = "Quietness",
+    lwd = "lwd",
+    popup.vars = c("Bicycles" = "Bicycle (Climate action plan)", popup_vars),
+    id = NULL,
+    palette = pal_quietness,
+    scale = scale_climate_quiet,
+    group = "Climate Action Plan",
+    legend.col.show = FALSE,
+    breaks = quietness_breaks) +
+  
+  tm_shape(rnet_quietest %>%
+    top_n(n = segment_count, wt = `Bicycle (Go Dutch)`) %>% 
+    mutate(lwd = set_min_value(`Bicycle (Go Dutch)`, multiplier = scale_go_dutch_quiet))
+    ) +
+  tm_lines(
+    title.col = "Cycle friendliness",
+    legend.col.reverse = TRUE,
+    col = "Quietness",
+    lwd = "lwd",
+    popup.vars = c("Bicycles" = "Bicycle (Go Dutch)", popup_vars),
+    id = NULL,
+    palette = pal_quietness,
+    scale = scale_go_dutch_quiet,
+    group = "Go Dutch",
+    legend.col.show = FALSE,
+    breaks = quietness_breaks) +
+  
+  tm_shape(rnet_quietest %>%
+    top_n(n = segment_count, wt = `Bicycle (Ebike)`) %>% 
+    mutate(lwd = set_min_value(`Bicycle (Ebike)`, multiplier = scale_ebike_quiet))
+    ) +
+  tm_lines(
+    title.col = "Cycle friendliness",
+    legend.col.reverse = TRUE,
+    col = "Quietness",
+    lwd = "lwd",
+    popup.vars = c("Bicycles" = "Bicycle (Ebike)", popup_vars),
+    id = NULL,
+    palette = pal_quietness,
+    scale = scale_ebike_quiet,
+    group = "Ebike",
+    legend.col.show = FALSE,
+    breaks = quietness_breaks) +
+  
+  tm_shape(schools_vis, name = "Schools") +
+  tm_dots(size = "total_for_vis",
+          col = "black",
+          border.lwd = 1,
+          border.col = "black",
+          scale = 0.3,
+          alpha = 0.6,
+          popup.vars = c("Official Name"= "Official_Name", "School type" = "school_type", "Number of students"="total"),
+          popup.format = list(total = list(digits = 0)),
+          id = NULL) +
+
+  tm_basemap(server = basemaps) +
+  tm_add_legend('fill', 
+                col = pal,
+                group = c("Quietest network", "Fastest network"),
+                labels = c("0 to 25", "25 to 50", "50 to 75", "75 to 100"),
+                title="Cycle friendliness")
+
+l_combined_quietest = m_combined_quietest %>%
+  tmap_leaflet(col = "Quietness") %>%
+  leaflet::hideGroup(group = rnet_groups)
+
+# Create combined fastest map -----------------------------------
+m_combined_fastest =
+  # Add border layer to
+  tm_shape(county_projected, name = "County border") +
+  tm_borders() +
+  tm_shape(
+  rnet_fastest %>%
+    top_n(n = segment_count, wt = `Bicycle (Baseline)`) %>% 
+    mutate(lwd = set_min_value(`Bicycle (Baseline)`, multiplier = scale_baseline_fast))
+) + 
+  tm_lines(
+    title.col = "Cycle friendliness",
+    col = "Quietness",
+    lwd = "lwd",
+    popup.vars = c("Bicycles" = "Bicycle (Baseline)", popup_vars),
+    id = NULL,
+    palette = pal_quietness,
+    scale = scale_baseline_fast,
+    group = "Baseline",
+    legend.col.show = FALSE,
+    breaks = quietness_breaks) +
+
+  tm_shape(
+    rnet_fastest %>%
+      top_n(n = segment_count, wt = `Bicycle (Near market)`) %>% 
+      mutate(lwd = set_min_value(`Bicycle (Near market)`, multiplier = scale_near_fast))
+  ) + 
+  tm_lines(
+    title.col = "Cycle friendliness",
+    col = "Quietness",
+    lwd = "lwd",
+    popup.vars = c("Bicycles" = "Bicycle (Near market)", popup_vars),
+    id = NULL,
+    palette = pal_quietness,
+    scale = scale_near_fast,
+    group = "Near Market",
+    legend.col.show = FALSE,
+    breaks = quietness_breaks) +
+  
+  tm_shape(
+    rnet_fastest %>%
+      top_n(n = segment_count, wt = `Bicycle (Climate action plan)`) %>%
+      mutate(lwd = set_min_value(`Bicycle (Climate action plan)`, multiplier = scale_climate_fast))
+  ) +
+  tm_lines(
+    title.col = "Cycle friendliness",
+    legend.col.reverse = TRUE,
+    col = "Quietness",
+    lwd = "lwd",
+    popup.vars = c("Bicycles" = "Bicycle (Climate action plan)", popup_vars),
+    id = NULL,
+    palette = pal_quietness,
+    scale = scale_climate_fast,
+    group = "Climate Action Plan",
+    legend.col.show = FALSE,
+    breaks = quietness_breaks) +
+  
+  tm_shape(rnet_fastest %>%
+             top_n(n = segment_count, wt = `Bicycle (Go Dutch)`) %>% 
+             mutate(lwd = set_min_value(`Bicycle (Go Dutch)`, multiplier = scale_go_dutch_fast))
+  ) +
+  tm_lines(
+    title.col = "Cycle friendliness",
+    col = "Quietness",
+    lwd = "lwd",
+    popup.vars = c("Bicycles" = "Bicycle (Go Dutch)", popup_vars),
+    id = NULL,
+    palette = pal_quietness,
+    scale = scale_go_dutch_fast,
+    group = "Go Dutch",
+    legend.col.show = FALSE,
+    breaks = quietness_breaks) +
+  
+  tm_shape(
+    rnet_fastest %>%
+      top_n(n = segment_count, wt = `Bicycle (Ebike)`) %>% 
+      mutate(lwd = set_min_value(`Bicycle (Ebike)`, multiplier = scale_ebike_fast))
+  ) +
+  tm_lines(
+    title.col = "Cycle friendliness",
+    col = "Quietness",
+    lwd = "lwd",
+    popup.vars = c("Bicycles" = "Bicycle (Ebike)", popup_vars),
+    id = NULL,
+    palette = pal_quietness,
+    scale = scale_ebike_fast,
+    group = "Ebike",
+    legend.col.show = FALSE,
+    breaks = quietness_breaks) +
+  
+  tm_shape(schools_vis, name = "Schools") +
+  tm_dots(size = "total_for_vis",
+          col = "black",
+          border.lwd = 1,
+          border.col = "black",
+          scale = 0.3,
+          alpha = 0.6,
+          popup.vars = c("Official Name"= "Official_Name", "School type" = "school_type", "Number of students"="total"),
+          popup.format = list(total = list(digits = 0)),
+          id = NULL) +
+  
+  tm_basemap(server = basemaps) +
+  tm_add_legend('fill', 
+                col = pal,
+                group = c("Quietest network", "Fastest network"),
+                labels = c("0 to 25", "25 to 50", "50 to 75", "75 to 100"),
+                title="Cycle friendliness")
+```

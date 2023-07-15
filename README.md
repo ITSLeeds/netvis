@@ -127,7 +127,7 @@ data-layout-align="center">
 
 </div>
 
-A function that does this would look something like this in R:
+A function that does this would look something like this in:
 
 ``` r
 scale_line_widths = function(x, max_width, width_multiplier) {

@@ -88,12 +88,15 @@ There are two problems with line widths in the maps shown above:
 - The thinnes lines are too thin
 - The thickest lines are too thick
 
-Given that the maximum width is determined by the `scale` argument, we can solve the first problem by increasing the value of `scale`.
-The second problem can be solved with a multiplier that prevents lines being x times thicker than the thinnest line.
-
 ```{r, echo=FALSE}
 maximum_width = 15
 minimum_width_multiplier = 5
+```
+
+Given that the maximum width is determined by the `scale` argument, we can solve the first problem by increasing the value of `scale`.
+The second problem can be solved with a multiplier that prevents lines being x times thicker than the thinnest lines, `r minimum_width_multiplier` times in this case.
+
+```{r, echo=FALSE}
 # get 95th percentile of line widths
 combined_values = rnet_central |>
   sf::st_drop_geometry() |>
@@ -140,4 +143,61 @@ m4 = tm_shape(
 tmap_save(m4, "maps/m4.html")
 # browseURL("maps/m4.html")
 webshot2::webshot("maps/m4.html")
+```
+
+A function that does this work would have the following structure in Python:
+
+```{python}
+def scale_line_widths(
+    data,
+    baseline_column,
+    dutch_column,
+    maximum_width = 15,
+    minimum_width_multiplier = 5
+):
+    """
+    Scale line widths for interactive maps.
+
+    Parameters
+    ----------
+    data : pandas.DataFrame
+        Dataframe containing the data to be plotted.
+    baseline_column : str
+        Name of the column containing the baseline values.
+    dutch_column : str
+        Name of the column containing the Go Dutch values.
+    maximum_width : int, optional
+        Maximum width of the lines in the interactive map. The default is 15.
+    minimum_width_multiplier : int, optional
+        The minimum width of the lines is the maximum value in the baseline
+        data divided by this value. The default is 5.
+
+    Returns
+    -------
+    data : pandas.DataFrame
+        Dataframe with a new column containing the scaled line widths.
+
+    """
+    # get 95th percentile of line widths
+    combined_values = data[[baseline_column, dutch_column]].quantile(0.95)
+    # Set mininum value to the maximum value in the combined data divided by the minimum width multiplier
+    minumum_value_allowed = combined_values.max() / minimum_width_multiplier
+    # scale line widths
+    scale = maximum_width / (combined_values[dutch_column] / combined_values[baseline_column])
+    data["lwd_dutch"] = data[dutch_column].apply(lambda x: minimum_value_allowed if x < minimum_value_allowed else x)
+    data["lwd_bicycle"] = data[baseline_column].apply(lambda x: minimum_value_allowed if x < minimum_value_allowed else x)
+    return data, scale
+```
+
+Starting with the data in `test-data/rnet_central.geojson` let's  test this function on a small subset of the data.
+
+```{python}
+import pandas as pd
+import geopandas as gpd
+import numpy as np
+data = gpd.read_file("test-data/rnet_central.geojson")
+data = data[["bicycle", "dutch_slc"]]
+data = data.iloc[0:10, :]
+data, scale = scale_line_widths(data, "bicycle", "dutch_slc")
+print(data)
 ```

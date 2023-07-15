@@ -71,9 +71,11 @@ rnet_central.plot()
 # Interactive maps
 
 Interactive maps are more engaging and policy-relevant, allowing people to zoom in and explore results.
-The images below illustrate interactive maps of the route network data.
+The images below illustrate interactive maps of the route network data focussed on the `bicycle` and `dutch_slc` variables.
 
 ```{r, echo=FALSE}
+rnet_central = rnet_central |>
+  select(bicycle, dutch_slc) 
 m1 = tm_shape(rnet_central) +
   tm_lines(
     lwd = "bicycle",
@@ -152,7 +154,6 @@ m3 = tm_shape(
   )
 # tmap_save(m3, "maps/m3.html")
 # browseURL("maps/m3.html")
-# webshot2::webshot("maps/m3.html")
 
 # For the Go Dutch scenario
 scale_dutch = max_width
@@ -183,7 +184,7 @@ if(!file.exists("maps/m3.png")) {
 
 :::
 
-A function that does this would look something like this in:
+A function that does this would look something like this:
 
 ```{r}
 scale_line_widths = function(x, max_width, width_multiplier) {
@@ -191,7 +192,8 @@ scale_line_widths = function(x, max_width, width_multiplier) {
 }
 ```
 
-```{r, echo=FALSE, eval=FALSE}
+This allows control over the widths.
+```{r, echo=FALSE}
 x = rnet_central |>
   select(bicycle, dutch_slc)
 scale_line_widths = function(
@@ -207,24 +209,45 @@ scale_line_widths = function(
     }
     )
   minimum_value_allowed = max(combined_values) / width_multiplier
-  scale = max_width / (quantile(x$dutch_slc, ptile) / quantile(x$bicycle, ptile))
-  x |>
+  x_scaled = x |>
     mutate(across(where(is.numeric), function(x) case_when(
       x < minimum_value_allowed ~ minimum_value_allowed,
       TRUE ~ x
     )) )
-}
-x_scaled = scale_line_widths(x)
-tm_shape(x_scaled) +
-  tm_lines(
-    lwd = "bicycle",
-    scale = scale
+  list(
+    tm_shape(x_scaled) +
+    tm_lines(
+      lwd = "bicycle",
+      scale = max_width / (quantile(x$dutch_slc, ptile) / quantile(x$bicycle, ptile))
+    ),
+    tm_shape(x_scaled) +
+    tm_lines(
+      lwd = "dutch_slc",
+      scale = max_width
+    )
   )
+  
+}
+m5 = scale_line_widths(x, width_multiplier = 3)
+# m5
+tmap_save(m5[[1]], "maps/m5.html")
+# browseURL("maps/m5.html")
+# webshot2::webshot("maps/m5.html", "maps/m5.png")
+tmap_save(m5[[2]], "maps/m6.html")
+# browseURL("maps/m6.html")
+# webshot2::webshot("maps/m6.html", "maps/m6.png")
+
 ```
 
+::: {#m1-2 layout-ncol=2}
 
+![](maps/m5.png)
 
-A function that does this work would have the following structure in Python:
+<!-- ![](maps/m4.png) -->
+
+:::
+
+Python attempt:
 
 ```{python}
 #| eval: false

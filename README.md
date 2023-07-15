@@ -49,7 +49,8 @@ style="width:100.0%" />
 
 Interactive maps are more engaging and policy-relevant, allowing people
 to zoom in and explore results. The images below illustrate interactive
-maps of the route network data.
+maps of the route network data focussed on the `bicycle` and `dutch_slc`
+variables.
 
 The maximum level of flow in the Go Dutch scenario is 6 times the
 maximum level of flow in the baseline scenario. We can use this to scale
@@ -127,13 +128,38 @@ data-layout-align="center">
 
 </div>
 
-A function that does this would look something like this in:
+A function that does this would look something like this:
 
 ``` r
 scale_line_widths = function(x, max_width, width_multiplier) {
   # ...
 }
 ```
+
+This allows control over the widths.
+
+<div id="m1-2">
+
+<table>
+<colgroup>
+<col style="width: 50%" />
+<col style="width: 50%" />
+</colgroup>
+<tbody>
+<tr class="odd">
+<td style="text-align: center;"><div width="50.0%"
+data-layout-align="center">
+<p><img src="maps/m5.png" data-fig.extended="false" /></p>
+</div></td>
+<td style="text-align: center;"><div width="50.0%"
+data-layout-align="center">
+<!-- ![](maps/m4.png) -->
+</div></td>
+</tr>
+</tbody>
+</table>
+
+</div>
 
 A function that does this work would have the following structure in
 Python:

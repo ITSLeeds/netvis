@@ -141,7 +141,7 @@ below, for example, we double the thickness of the lines in the baseline
 by setting the `width_multiplier` to 2.5, making the lines more visible.
 
 ``` r
-m5 = scale_line_widths(x, width_multiplier = 2.5)
+m5 = scale_line_widths(x, max_width = 40, min_width = 1)
 # m5
 ```
 

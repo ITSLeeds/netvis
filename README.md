@@ -131,18 +131,19 @@ data-layout-align="center">
 A function that does this would look something like this:
 
 ``` r
-scale_line_widths = function(x, max_width, width_multiplier) {
+scale_line_widths = function(x, max_width, min_width) {
   # ...
 }
 ```
 
-This allows control over the widths with a single argument. In the plot
-below, for example, we double the thickness of the lines in the baseline
-by setting the `width_multiplier` to 2.5, making the lines more visible.
+In the plot below, for example, we increase the thickness of the
+thinnest lines by setting `min_width` to 3, making the lines with less
+flow more visible.
 
 ``` r
-m5 = scale_line_widths(x, max_width = 40, min_width = 1)
-# m5
+m5 = scale_line_widths(x, max_width = 15, min_width = 3)
+# m5[[1]]
+# m5[[2]]
 ```
 
 <div id="m1-2">

@@ -34,6 +34,10 @@ plot(rnet_central)
 <img src="man/figures/README-unnamed-chunk-4-1.png"
 style="width:100.0%" />
 
+``` r
+usethis::use_data(rnet_central, overwrite = TRUE)
+```
+
 In Python this would look something like this:
 
 ``` python
@@ -105,7 +109,7 @@ can solve the first problem by increasing the value of `scale`. The
 second problem can be solved with a multiplier that prevents lines being
 x times thicker than the thinnest lines, 5 times in this case.
 
-<div id="m1-2">
+<div>
 
 <table>
 <colgroup>
@@ -146,7 +150,7 @@ m5 = scale_line_widths(x, max_width = 15, min_width = 3)
 # m5[[2]]
 ```
 
-<div id="m1-2">
+<div>
 
 <table>
 <colgroup>
@@ -168,6 +172,12 @@ data-layout-align="center">
 </table>
 
 </div>
+
+Instead of showing different layers side-by-side, it’s useful to be able
+to select them as different layers interactively. The `netvis()`
+function defined in this packages does that, as illustrated below.
+
+![](https://user-images.githubusercontent.com/1825120/253802338-83fdcbea-3a43-4ae7-b2d6-db6810e9c89c.png)
 
 <!-- Python attempt: -->
 <!-- Starting with the data in `test-data/rnet_central.geojson` let's  test this function on a small subset of the data. -->

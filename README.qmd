@@ -26,6 +26,7 @@ tmap_mode("view")
 ```
 
 <!-- badges: start -->
+
 <!-- badges: end -->
 
 The goal of this repo is to demonstrate different visualisation techniques for communicating information about transport networks.
@@ -37,7 +38,9 @@ The goal of this repo is to demonstrate different visualisation techniques for c
 
 # Example data
 
-We'll use a route network dataset from the Propensity to Cycle Tool (PCT) to demonstrate the package. The PCT is a web application that allows users to explore cycling potential across England and Wales. The PCT is available at [www.pct.bike](https://www.pct.bike/).
+We'll use a route network dataset from the Propensity to Cycle Tool (PCT) to demonstrate the package.
+The PCT is a web application that allows users to explore cycling potential across England and Wales.
+The PCT is available at [www.pct.bike](https://www.pct.bike/).
 
 # Static data visualisation
 
@@ -60,6 +63,7 @@ rnet_central = sf::st_intersection(rnet_leeds, central_leeds)
 ```{r}
 rnet_central = sf::read_sf("test-data/rnet_central.geojson")
 plot(rnet_central)
+usethis::use_data(rnet_central, overwrite = TRUE)
 ```
 
 In Python this would look something like this:
@@ -89,7 +93,8 @@ tmap_save(m1, "maps/m1.html")
 width_multiplier = round(max(rnet_central$dutch_slc) / max(rnet_central$bicycle))
 ```
 
-The maximum level of flow in the Go Dutch scenario is `r round(width_multiplier)` times the maximum level of flow in the baseline scenario. We can use this to scale the line widths as illustrated below.
+The maximum level of flow in the Go Dutch scenario is `r round(width_multiplier)` times the maximum level of flow in the baseline scenario.
+We can use this to scale the line widths as illustrated below.
 
 ```{r}
 m2 = tm_shape(rnet_central) +
@@ -105,19 +110,16 @@ if(!file.exists("maps/m1.png")) {
 }
 ```
 
-::: {#m1-2 layout-ncol=2}
-
+::: {#m1-2 layout-ncol="2"}
 ![](maps/m1.png){#fig-surus}
 
 ![](maps/m2.png){#fig-hanno}
-
 :::
-
 
 There are two problems with line widths in the maps shown above:
 
-- The thinnes lines are too thin
-- The thickest lines are too thick
+-   The thinnes lines are too thin
+-   The thickest lines are too thick
 
 ```{r, echo=FALSE}
 max_width = 15
@@ -178,12 +180,10 @@ if(!file.exists("maps/m3.png")) {
 }
 ```
 
-::: {#m1-2 layout-ncol=2}
-
+::: {layout-ncol="2"}
 ![](maps/m3.png)
 
 ![](maps/m4.png)
-
 :::
 
 A function that does this would look something like this:
@@ -264,13 +264,16 @@ tmap_save(m5[[2]], "maps/m6.html")
 # webshot2::webshot("maps/m6.html", "maps/m6.png")
 ```
 
-::: {#m1-2 layout-ncol=2}
-
+::: {layout-ncol="2"}
 ![](maps/m5.png)
 
 ![](maps/m6.png)
-
 :::
+
+Instead of showing different layers side-by-side, it's useful to be able to select them as different layers interactively.
+The `netvis()` function defined in this packages does that, as illustrated below.
+
+![](https://user-images.githubusercontent.com/1825120/253802338-83fdcbea-3a43-4ae7-b2d6-db6810e9c89c.png)
 
 <!-- Python attempt: -->
 

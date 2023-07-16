@@ -4,6 +4,8 @@ title: netvis
 format: gfm
 number-sections: true
 toc: true
+editor:
+  render-on-save: true
 ---
 
 <!-- README.md is generated from README.Rmd. Please edit that file -->
@@ -192,7 +194,9 @@ scale_line_widths = function(x, max_width, width_multiplier) {
 }
 ```
 
-This allows control over the widths.
+This allows control over the widths with a single argument.
+In the plot below, for example, we double the thickness of the lines in the baseline by setting the `width_multiplier` to 2.5, making the lines more visible.
+
 ```{r, echo=FALSE}
 x = rnet_central |>
   select(bicycle, dutch_slc)
@@ -226,28 +230,32 @@ scale_line_widths = function(
       scale = max_width
     )
   )
-  
 }
-m5 = scale_line_widths(x, width_multiplier = 3)
+```
+
+```{r}
+m5 = scale_line_widths(x, width_multiplier = 2.5)
 # m5
+```
+
+```{r, echo=FALSE, out.width="50%", fig.show="hold"}
 tmap_save(m5[[1]], "maps/m5.html")
 # browseURL("maps/m5.html")
 # webshot2::webshot("maps/m5.html", "maps/m5.png")
 tmap_save(m5[[2]], "maps/m6.html")
 # browseURL("maps/m6.html")
 # webshot2::webshot("maps/m6.html", "maps/m6.png")
-
 ```
 
 ::: {#m1-2 layout-ncol=2}
 
 ![](maps/m5.png)
 
-<!-- ![](maps/m4.png) -->
+![](maps/m6.png)
 
 :::
 
-Python attempt:
+<!-- Python attempt: -->
 
 ```{python}
 #| eval: false
@@ -293,7 +301,7 @@ def scale_line_widths(
     return data, scale
 ```
 
-Starting with the data in `test-data/rnet_central.geojson` let's  test this function on a small subset of the data.
+<!-- Starting with the data in `test-data/rnet_central.geojson` let's  test this function on a small subset of the data. -->
 
 ```{python}
 #| eval: false

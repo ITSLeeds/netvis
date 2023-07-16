@@ -136,7 +136,14 @@ scale_line_widths = function(x, max_width, width_multiplier) {
 }
 ```
 
-This allows control over the widths.
+This allows control over the widths with a single argument. In the plot
+below, for example, we double the thickness of the lines in the baseline
+by setting the `width_multiplier` to 2.5, making the lines more visible.
+
+``` r
+m5 = scale_line_widths(x, width_multiplier = 2.5)
+# m5
+```
 
 <div id="m1-2">
 
@@ -153,7 +160,7 @@ data-layout-align="center">
 </div></td>
 <td style="text-align: center;"><div width="50.0%"
 data-layout-align="center">
-<!-- ![](maps/m4.png) -->
+<p><img src="maps/m6.png" data-fig.extended="false" /></p>
 </div></td>
 </tr>
 </tbody>
@@ -161,8 +168,5 @@ data-layout-align="center">
 
 </div>
 
-A function that does this work would have the following structure in
-Python:
-
-Starting with the data in `test-data/rnet_central.geojson` let’s test
-this function on a small subset of the data.
+<!-- Python attempt: -->
+<!-- Starting with the data in `test-data/rnet_central.geojson` let's  test this function on a small subset of the data. -->

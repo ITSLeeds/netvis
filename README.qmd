@@ -203,26 +203,42 @@ x = rnet_central |>
 scale_line_widths = function(
   x,
   max_width = 15,
-  width_multiplier = 5,
-  ptile = 0.95
+  max_width_low = 5,
+  min_width = 1,
+  ptile = 0.99,
+  width_regex = "bicycle|dutch_slc",
+  width_multiplier = NULL
 ) {
-  combined_values = x |>
+  if(is.null(width_multiplier)) {
+    width_multiplier = max_width / max_width_low
+  }
+  x_no_outliers = x |>
     sf::st_drop_geometry() |>
-    sapply(function(x) {
-      quantile(x, ptile)
-    }
-    )
-  minimum_value_allowed = max(combined_values) / width_multiplier
-  x_scaled = x |>
-    mutate(across(where(is.numeric), function(x) case_when(
+    select(matches(width_regex)) |>
+    mutate_all(function(x) {
+      x[x > quantile(x, ptile)] = quantile(x, ptile)
+      x
+    })
+  # waldo::compare(x, x_no_outliers) # large values gone
+  max_value = max(x_no_outliers)
+  x_normalized = x_no_outliers |>
+    mutate_all(function(x) x / max_value)
+  summary(x_normalized)
+  maximums = x_normalized |>
+    sapply(max)
+  # summary(x_normalized)
+  minimum_value_allowed = min(maximums) / width_multiplier
+
+  x_scaled = x_normalized |>
+    mutate_all(function(x) case_when(
       x < minimum_value_allowed ~ minimum_value_allowed,
       TRUE ~ x
-    )) )
+    ))
   list(
     tm_shape(x_scaled) +
     tm_lines(
       lwd = "bicycle",
-      scale = max_width / (quantile(x$dutch_slc, ptile) / quantile(x$bicycle, ptile))
+      scale = max_width_low
     ),
     tm_shape(x_scaled) +
     tm_lines(

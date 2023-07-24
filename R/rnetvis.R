@@ -16,6 +16,8 @@
 #' netvis(rnet, min_width = 3)
 #' # Small variations in line width
 #' netvis(rnet, min_width = 3, max_width = 10)
+#' rnet = rnet_limerick
+#' netvis(rnet_limerick, width_regex = "Bicycle")
 netvis = function(
     rnet,
     min_width = 1,
@@ -29,7 +31,7 @@ netvis = function(
     rnet,
     min_width = min_width,
     max_width = max_width,
-    width_regex = "bi|du",
+    width_regex = width_regex,
     width_multiplier = width_multiplier,
     ptile = ptile
   )

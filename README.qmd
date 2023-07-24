@@ -55,7 +55,10 @@ central_limerick = zones_limerick |>
   dplyr::filter(circle_id == 1) |>
   sf::st_union()
 rnet_limerick = sf::st_intersection(rnet_limerick_balanced_full, central_limerick)
+# Make numeric cols numerics not chars:
+rnet_limerick = rnet_limerick # ...
 sf::st_write(rnet_limerick, "test-data/rnet_limerick.geojson", delete_dsn = TRUE)
+usethis::use_data(rnet_limerick)
 ```
 
 ```{r}

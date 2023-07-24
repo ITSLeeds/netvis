@@ -13,7 +13,9 @@
 #' @examples
 #' rnet = rnet_central
 #' netvis(rnet)
-#' netvis(rnet, min_width = 3, max_width = 6)
+#' netvis(rnet, min_width = 3)
+#' # Small variations in line width
+#' netvis(rnet, min_width = 3, max_width = 10)
 netvis = function(
     rnet,
     min_width = 1,

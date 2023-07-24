@@ -21,17 +21,30 @@ We’ll use a route network dataset from the Propensity to Cycle Tool
 allows users to explore cycling potential across England and Wales. The
 PCT is available at [www.pct.bike](https://www.pct.bike/).
 
+We also provide an example dataset from Limerick, Ireland, from the
+CRUSE project. This is imported and plotted with code shown below.
+
+``` r
+rnet_limerick = sf::read_sf("test-data/rnet_limerick.geojson")
+plot(rnet_limerick)
+```
+
+<img src="man/figures/README-unnamed-chunk-4-1.png"
+style="width:100.0%" />
+
 # Static data visualisation
 
 A simple visualisation of the data in a multi-panel static map is shown
 below.
+
+Read in data for Leeds with the following:
 
 ``` r
 rnet_central = sf::read_sf("test-data/rnet_central.geojson")
 plot(rnet_central)
 ```
 
-<img src="man/figures/README-unnamed-chunk-4-1.png"
+<img src="man/figures/README-unnamed-chunk-6-1.png"
 style="width:100.0%" />
 
 ``` r
@@ -46,7 +59,7 @@ rnet_central = gpd.read_file("test-data/rnet_central.geojson")
 rnet_central.plot()
 ```
 
-<img src="man/figures/README-unnamed-chunk-5-1.png"
+<img src="man/figures/README-unnamed-chunk-7-1.png"
 style="width:100.0%" />
 
 # Interactive maps

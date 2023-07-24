@@ -42,6 +42,28 @@ We'll use a route network dataset from the Propensity to Cycle Tool (PCT) to dem
 The PCT is a web application that allows users to explore cycling potential across England and Wales.
 The PCT is available at [www.pct.bike](https://www.pct.bike/).
 
+We also provide an example dataset from Limerick, Ireland, from the CRUSE project.
+This is imported and plotted with code shown below.
+
+```{r}
+#| eval: false
+#| echo: false
+u = "https://cruse.bike/limerick/rnet_combined_balanced.gpkg"
+rnet_limerick_balanced_full = sf::read_sf(u)
+zones_limerick = zonebuilder::zb_zone("limerick")
+central_limerick = zones_limerick |>
+  dplyr::filter(circle_id == 1) |>
+  sf::st_union()
+rnet_limerick = sf::st_intersection(rnet_limerick_balanced_full, central_limerick)
+sf::st_write(rnet_limerick, "test-data/rnet_limerick.geojson", delete_dsn = TRUE)
+```
+
+```{r}
+rnet_limerick = sf::read_sf("test-data/rnet_limerick.geojson")
+plot(rnet_limerick)
+```
+
+
 # Static data visualisation
 
 A simple visualisation of the data in a multi-panel static map is shown below.
@@ -60,6 +82,8 @@ rnet_central = sf::st_intersection(rnet_leeds, central_leeds)
 # sf::st_write(rnet_central, "test-data/rnet_central.geojson", delete_dsn = TRUE)
 ```
 
+Read in data for Leeds with the following:
+
 ```{r}
 rnet_central = sf::read_sf("test-data/rnet_central.geojson")
 plot(rnet_central)
@@ -73,6 +97,8 @@ import geopandas as gpd
 rnet_central = gpd.read_file("test-data/rnet_central.geojson")
 rnet_central.plot()
 ```
+
+
 
 # Interactive maps
 

@@ -56,7 +56,16 @@ central_limerick = zones_limerick |>
   sf::st_union()
 rnet_limerick = sf::st_intersection(rnet_limerick_balanced_full, central_limerick)
 # Make numeric cols numerics not chars:
-rnet_limerick = rnet_limerick # ...
+# To do this, values of "1-10" need to be changed to 3 (or another integer)
+rnet_limerick$`Bicycle (Baseline)` = gsub("1-10", 3, rnet_limerick$`Bicycle (Baseline)`)
+rnet_limerick$`Bicycle (Near market)` = gsub("1-10", 3, rnet_limerick$`Bicycle (Near market)`)
+rnet_limerick$`Bicycle (Climate action plan)` = gsub("1-10", 3, rnet_limerick$`Bicycle (Climate action plan)`)
+rnet_limerick$`Bicycle (Go Dutch)` = gsub("1-10", 3, rnet_limerick$`Bicycle (Go Dutch)`)
+rnet_limerick$`Bicycle (Ebike)` = gsub("1-10", 3, rnet_limerick$`Bicycle (Ebike)`)
+
+rnet_limerick = rnet_limerick |>
+  mutate(across(c(`Bicycle (Baseline)`:`Bicycle (Ebike)`), ~as.numeric(.)))
+
 sf::st_write(rnet_limerick, "test-data/rnet_limerick.geojson", delete_dsn = TRUE)
 usethis::use_data(rnet_limerick)
 ```

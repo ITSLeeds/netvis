@@ -20,8 +20,8 @@
 #' netvis(rnet, width_regex = "Bicycle")
 netvis = function(
     rnet,
-    min_width = 1,
-    max_width = 10,
+    min_width = 1.5,
+    max_width = 6,
     width_regex = "bi|du",
     output = "list",
     width_multiplier = NULL,
@@ -58,6 +58,7 @@ scale_line_widths = function(
     width_multiplier = NULL,
     ptile = 0.95
     ) {
+  # browser()
   names_width = names(x)[grepl(width_regex, names(x))]
   names_width_lwd = paste0(names_width, "_lwd")
   names(names_width_lwd) = names_width
@@ -85,8 +86,10 @@ scale_line_widths = function(
   summary(x_scaled)
   maximums = x_scaled |> sapply(max)
   max_widths = maximums * max_width
+  names(max_widths) = names_width
   names(x_scaled) = names_width_lwd
-  x_to_plot = cbind(x, x_scaled)
+  x_to_plot = dplyr::bind_cols(x, x_scaled)
+  # names(x_to_plot)
   nm = names_width[1]
   map_list = lapply(names_width, function(nm) {
    tmap::tm_shape(x_to_plot) +

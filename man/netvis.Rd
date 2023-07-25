@@ -6,8 +6,8 @@
 \usage{
 netvis(
   rnet,
-  min_width = 1,
-  max_width = 10,
+  min_width = 2,
+  max_width = 6,
   width_regex = "bi|du",
   output = "list",
   width_multiplier = NULL,
@@ -31,8 +31,10 @@ Visualise route networks
 }
 \examples{
 rnet = rnet_central
-library(dplyr)
-library(tmap)
-netvis(rnet_central)
-netvis(rnet_central, min_width = 3, max_width = 6)
+netvis(rnet)
+netvis(rnet, min_width = 3)
+# Small variations in line width
+netvis(rnet, min_width = 3, max_width = 10)
+rnet = rnet_limerick
+netvis(rnet, width_regex = "Bicycle")
 }

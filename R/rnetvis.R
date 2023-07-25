@@ -20,7 +20,7 @@
 #' netvis(rnet, width_regex = "Bicycle")
 netvis = function(
     rnet,
-    min_width = 1.5,
+    min_width = 2,
     max_width = 6,
     width_regex = "bi|du",
     output = "list",
@@ -83,7 +83,7 @@ scale_line_widths = function(
       x < minimum_value_allowed ~ minimum_value_allowed,
       TRUE ~ x
     ))
-  summary(x_scaled)
+  # summary(x_scaled)
   maximums = x_scaled |> sapply(max)
   max_widths = maximums * max_width
   names(max_widths) = names_width
@@ -96,7 +96,8 @@ scale_line_widths = function(
      tmap::tm_lines(
         lwd = names_width_lwd[nm],
         scale = max_widths[[nm]],
-        group = nm
+        group = nm,
+        id = ""
       )
   })
   names(map_list) = names_width

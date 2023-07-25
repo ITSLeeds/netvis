@@ -23,7 +23,19 @@
 #'   "Gradient" = "Gradient"
 #' )
 #' netvis(rnet, width_regex = "Bicycle", popup_vars = popup_vars)
-#' netvis(rnet, width_regex = "Bicycle", popup_vars = popup_vars, width_var_name = "Bicycle trips")
+#' netvis(rnet, width_regex = "Bicycle", popup_vars = popup_vars,
+#'    width_var_name = "Bicycle trips")
+#' pal = c('#882255','#CC6677', '#44AA99', '#117733')
+#' quietness_breaks = c(0, 35, 70, 85, 100)
+#' basemaps = c(
+#'   `Grey basemap` = "CartoDB.Positron",
+#'   `Coloured basemap` = "Esri.WorldTopoMap",
+#'   `Cycleways (OSM)` = "https://b.tile-cyclosm.openstreetmap.fr/cyclosm/{z}/{x}/{y}.png",
+#'   `Satellite image` = "https://server.arcgisonline.com/ArcGIS/rest/services/World_Imagery/MapServer/tile/{z}/{y}/{x}'"
+#' )
+#' netvis(rnet, width_regex = "Bicycle", popup_vars = popup_vars,
+#'    width_var_name = "Bicycle trips", col = "Quietness", pal = pal,
+#'    breaks = quietness_breaks, basemaps = basemaps)
 netvis = function(
     x,
     min_width = 2,
@@ -33,7 +45,9 @@ netvis = function(
     output = "list",
     width_multiplier = NULL,
     ptile = 0.95,
-    popup_vars = NULL
+    popup_vars = NULL,
+    basemaps = NULL,
+    ...
 ) {
   names_width = names(x)[grepl(width_regex, names(x))]
   names_width_lwd = paste0(names_width, "_lwd")
@@ -76,7 +90,8 @@ netvis = function(
         lwd = names_width_lwd[nm],
         scale = max_widths[[nm]],
         group = nm,
-        id = ""
+        id = "",
+        ...
       )
   })
   names(map_list) = names_width
@@ -92,6 +107,9 @@ netvis = function(
     } else {
       m = m + map_list[[i]]
     }
+  }
+  if(!is.null(basemaps)) {
+    m = m + tmap::tm_basemap(server = basemaps)
   }
   lm = tmap::tmap_leaflet(m) |>
     leaflet::hideGroup(nms[-1])

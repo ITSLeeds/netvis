@@ -13,7 +13,9 @@ netvis(
   output = "list",
   width_multiplier = NULL,
   ptile = 0.95,
-  popup_vars = NULL
+  popup_vars = NULL,
+  basemaps = NULL,
+  ...
 )
 }
 \arguments{
@@ -44,5 +46,17 @@ popup_vars = c(
   "Gradient" = "Gradient"
 )
 netvis(rnet, width_regex = "Bicycle", popup_vars = popup_vars)
-netvis(rnet, width_regex = "Bicycle", popup_vars = popup_vars, width_var_name = "Bicycle trips")
+netvis(rnet, width_regex = "Bicycle", popup_vars = popup_vars,
+   width_var_name = "Bicycle trips")
+pal = c('#882255','#CC6677', '#44AA99', '#117733')
+quietness_breaks = c(0, 35, 70, 85, 100)
+basemaps = c(
+  `Grey basemap` = "CartoDB.Positron",
+  `Coloured basemap` = "Esri.WorldTopoMap",
+  `Cycleways (OSM)` = "https://b.tile-cyclosm.openstreetmap.fr/cyclosm/{z}/{x}/{y}.png",
+  `Satellite image` = "https://server.arcgisonline.com/ArcGIS/rest/services/World_Imagery/MapServer/tile/{z}/{y}/{x}'"
+)
+netvis(rnet, width_regex = "Bicycle", popup_vars = popup_vars,
+   width_var_name = "Bicycle trips", col = "Quietness", pal = pal,
+   breaks = quietness_breaks, basemaps = basemaps)
 }

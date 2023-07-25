@@ -4,7 +4,6 @@
 #' @param x 
 #' @param min_width 
 #' @param max_width 
-#' @param attrib
 #' @param popup_vars Variables to appear in popups
 #'
 #' @return
@@ -24,13 +23,13 @@
 #'   "Gradient" = "Gradient"
 #' )
 #' netvis(rnet, width_regex = "Bicycle", popup_vars = popup_vars)
-#' netvis(rnet, width_regex = "Bicycle", width_regex_name = r"(\([^)]*\))")
+#' netvis(rnet, width_regex = "Bicycle", popup_vars = popup_vars, width_var_name = "Bicycle trips")
 netvis = function(
     x,
     min_width = 2,
     max_width = 6,
     width_regex = "bi|du",
-    width_regex_name = NULL,
+    width_var_name = NULL,
     output = "list",
     width_multiplier = NULL,
     ptile = 0.95,
@@ -66,12 +65,14 @@ netvis = function(
   names(max_widths) = names_width
   names(x_scaled) = names_width_lwd
   x_to_plot = dplyr::bind_cols(x, x_scaled)
-  # names(x_to_plot)
   nm = names_width[1]
   map_list = lapply(names_width, function(nm) {
+    pvs = c(nm, popup_vars)
+    names(pvs)[1] = width_var_name
+    names(popup_vars)
     tmap::tm_shape(x_to_plot) +
       tmap::tm_lines(
-        popup.vars = c(nm, popup_vars),
+        popup.vars = pvs,
         lwd = names_width_lwd[nm],
         scale = max_widths[[nm]],
         group = nm,

@@ -5,23 +5,25 @@
 \title{Visualise route networks}
 \usage{
 netvis(
-  rnet,
+  x,
   min_width = 2,
   max_width = 6,
   width_regex = "bi|du",
+  width_var_name = NULL,
   output = "list",
   width_multiplier = NULL,
-  ptile = 0.95
+  ptile = 0.95,
+  popup_vars = NULL
 )
 }
 \arguments{
-\item{rnet}{}
+\item{x}{}
 
 \item{min_width}{}
 
 \item{max_width}{}
 
-\item{attrib}{}
+\item{popup_vars}{Variables to appear in popups}
 }
 \value{
 A tmap or leaflet object
@@ -37,4 +39,10 @@ netvis(rnet, min_width = 3)
 netvis(rnet, min_width = 3, max_width = 10)
 rnet = rnet_limerick
 netvis(rnet, width_regex = "Bicycle")
+popup_vars = c(
+  "Cycle friendliness" = "Quietness",
+  "Gradient" = "Gradient"
+)
+netvis(rnet, width_regex = "Bicycle", popup_vars = popup_vars)
+netvis(rnet, width_regex = "Bicycle", popup_vars = popup_vars, width_var_name = "Bicycle trips")
 }

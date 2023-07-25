@@ -1,7 +1,7 @@
 
 #' Visualise route networks
 #'
-#' @param rnet 
+#' @param x 
 #' @param min_width 
 #' @param max_width 
 #' @param attrib
@@ -24,48 +24,18 @@
 #'   "Gradient" = "Gradient"
 #' )
 #' netvis(rnet, width_regex = "Bicycle", popup_vars = popup_vars)
+#' netvis(rnet, width_regex = "Bicycle", width_regex_name = r"(\([^)]*\))")
 netvis = function(
-    rnet,
+    x,
     min_width = 2,
     max_width = 6,
     width_regex = "bi|du",
+    width_regex_name = NULL,
     output = "list",
     width_multiplier = NULL,
     ptile = 0.95,
     popup_vars = NULL
 ) {
-  maps = scale_line_widths(
-    rnet,
-    min_width = min_width,
-    max_width = max_width,
-    width_regex = width_regex,
-    width_multiplier = width_multiplier,
-    ptile = ptile
-  )
-  # browser()
-  i = 1
-  nms = names(maps)
-  # Create layer for column 1:
-  for(i in seq(length(maps))) {
-    if(i == 1) {
-      m <<- maps[[1]]
-    } else {
-      m = m + maps[[i]]
-    }
-  }
-  lm = tmap::tmap_leaflet(m) |>
-    leaflet::hideGroup(nms[-1])
-  lm
-}
-scale_line_widths = function(
-    x,
-    min_width = 1,
-    max_width = 10,
-    width_regex = "bi|du",
-    width_multiplier = NULL,
-    ptile = 0.95
-    ) {
-  # browser()
   names_width = names(x)[grepl(width_regex, names(x))]
   names_width_lwd = paste0(names_width, "_lwd")
   names(names_width_lwd) = names_width
@@ -99,8 +69,8 @@ scale_line_widths = function(
   # names(x_to_plot)
   nm = names_width[1]
   map_list = lapply(names_width, function(nm) {
-   tmap::tm_shape(x_to_plot) +
-     tmap::tm_lines(
+    tmap::tm_shape(x_to_plot) +
+      tmap::tm_lines(
         popup.vars = c(nm, popup_vars),
         lwd = names_width_lwd[nm],
         scale = max_widths[[nm]],
@@ -111,4 +81,18 @@ scale_line_widths = function(
   names(map_list) = names_width
   # map_list[[1]]
   map_list
+  # browser()
+  i = 1
+  nms = names(map_list)
+  # Create layer for column 1:
+  for(i in seq(length(map_list))) {
+    if(i == 1) {
+      m <<- map_list[[1]]
+    } else {
+      m = m + map_list[[i]]
+    }
+  }
+  lm = tmap::tmap_leaflet(m) |>
+    leaflet::hideGroup(nms[-1])
+  lm
 }

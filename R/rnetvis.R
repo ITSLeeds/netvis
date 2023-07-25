@@ -4,7 +4,8 @@
 #' @param rnet 
 #' @param min_width 
 #' @param max_width 
-#' @param attrib 
+#' @param attrib
+#' @param popup_vars Variables to appear in popups
 #'
 #' @return
 #' A tmap or leaflet object
@@ -18,6 +19,11 @@
 #' netvis(rnet, min_width = 3, max_width = 10)
 #' rnet = rnet_limerick
 #' netvis(rnet, width_regex = "Bicycle")
+#' popup_vars = c(
+#'   "Cycle friendliness" = "Quietness",
+#'   "Gradient" = "Gradient"
+#' )
+#' netvis(rnet, width_regex = "Bicycle", popup_vars = popup_vars)
 netvis = function(
     rnet,
     min_width = 2,
@@ -25,7 +31,8 @@ netvis = function(
     width_regex = "bi|du",
     output = "list",
     width_multiplier = NULL,
-    ptile = 0.95
+    ptile = 0.95,
+    popup_vars = NULL
 ) {
   maps = scale_line_widths(
     rnet,
@@ -94,6 +101,7 @@ scale_line_widths = function(
   map_list = lapply(names_width, function(nm) {
    tmap::tm_shape(x_to_plot) +
      tmap::tm_lines(
+        popup.vars = c(nm, popup_vars),
         lwd = names_width_lwd[nm],
         scale = max_widths[[nm]],
         group = nm,

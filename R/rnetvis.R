@@ -18,6 +18,10 @@
 #' netvis(rnet, min_width = 3, max_width = 10)
 #' rnet = rnet_limerick
 #' netvis(rnet, width_regex = "Bicycle")
+#' m = netvis(rnet, width_regex = "Bicycle", output = "tmap")
+#' class(m)
+#' tmap::tmap_mode("view")
+#' m
 #' popup_vars = c(
 #'   "Cycle friendliness" = "Quietness",
 #'   "Gradient" = "Gradient"
@@ -42,7 +46,7 @@ netvis = function(
     max_width = 6,
     width_regex = "bi|du",
     width_var_name = NULL,
-    output = "list",
+    output = "leaflet",
     width_multiplier = NULL,
     ptile = 0.95,
     popup_vars = NULL,
@@ -82,8 +86,9 @@ netvis = function(
   nm = names_width[1]
   map_list = lapply(names_width, function(nm) {
     pvs = c(nm, popup_vars)
-    names(pvs)[1] = width_var_name
-    names(popup_vars)
+    if(!is.null(width_var_name)) {
+      names(pvs)[1] = width_var_name
+    }
     tmap::tm_shape(x_to_plot) +
       tmap::tm_lines(
         popup.vars = pvs,
@@ -110,6 +115,9 @@ netvis = function(
   }
   if(!is.null(basemaps)) {
     m = m + tmap::tm_basemap(server = basemaps)
+  }
+  if(output == "tmap") {
+    return(m)
   }
   lm = tmap::tmap_leaflet(m) |>
     leaflet::hideGroup(nms[-1])

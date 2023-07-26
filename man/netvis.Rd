@@ -10,7 +10,7 @@ netvis(
   max_width = 6,
   width_regex = "bi|du",
   width_var_name = NULL,
-  output = "list",
+  output = "leaflet",
   width_multiplier = NULL,
   ptile = 0.95,
   popup_vars = NULL,
@@ -41,6 +41,10 @@ netvis(rnet, min_width = 3)
 netvis(rnet, min_width = 3, max_width = 10)
 rnet = rnet_limerick
 netvis(rnet, width_regex = "Bicycle")
+m = netvis(rnet, width_regex = "Bicycle", output = "tmap")
+class(m)
+tmap::tmap_mode("view")
+m
 popup_vars = c(
   "Cycle friendliness" = "Quietness",
   "Gradient" = "Gradient"

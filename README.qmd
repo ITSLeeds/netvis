@@ -74,7 +74,6 @@ rnet_limerick = sf::read_sf("test-data/rnet_limerick.geojson")
 plot(rnet_limerick)
 ```
 
-
 # Static data visualisation
 
 A simple visualisation of the data in a multi-panel static map is shown below.
@@ -108,8 +107,6 @@ import geopandas as gpd
 rnet_central = gpd.read_file("test-data/rnet_central.geojson")
 rnet_central.plot()
 ```
-
-
 
 # Interactive maps
 
@@ -371,4 +368,34 @@ data = data[["bicycle", "dutch_slc"]]
 data = data.iloc[0:10, :]
 dw, scale = scale_line_widths(data, "bicycle", "dutch_slc")
 print(dw)
+```
+
+```{r}
+#| eval: false
+#| echo: false
+
+# https://github.com/nptscot/outputdata/releases/tag/v2023-07-11-00-00-48.247456_commit_282d4661618e5e60ad9c34a6368db84745473d18
+rnet_edinburgh = readRDS("/tmp/combined_network.Rds")
+sf::write_sf(rnet_edinburgh, "~/github/nptscot/networkmerge/large_route_network_example_edingurgh.geojson")
+zones_edinburgh = zonebuilder::zb_zone("princes street edinburgh")
+mapview::mapview(zones_edinburgh)
+# library(osmdata)
+# princes_street_all = opq("edinburgh") %>%
+#   add_osm_feature(key = "name", value = "Princes Street") %>% 
+#   osmdata_sf()
+osm_edinburgh = osmextract::oe_get("Edinburgh")
+princes_street = osm_edinburgh |> 
+  filter(name == "Princes Street")
+plot(princes_street$geometry)
+princes_street_buffer = princes_street |> 
+  sf::st_union() |> 
+  sf::st_buffer(dist = 100)
+rnet_princes_street = rnet_edinburgh[princes_street_buffer, , op = sf::st_within]
+plot(rnet_princes_street$geometry)
+rnet_princes_street = rnet_princes_street |> 
+  select(commute_fastest_bicycle_go_dutch, Quietness)
+rnet_princes_street |> plot()
+sf::write_sf(rnet_princes_street, "data/rnet_princes_street_minimal.geojson")
+sf::write_sf(rnet_princes_street, "~/github/nptscot/networkmerge/data/rnet_princes_street_minimal.geojson")
+
 ```

@@ -84,6 +84,8 @@ netvis = function(
   names(x_scaled) = names_width_lwd
   x_to_plot = dplyr::bind_cols(x, x_scaled)
   nm = names_width[1]
+  # browser()
+  # nm = names_width[1] # for debugging
   map_list = lapply(names_width, function(nm) {
     pvs = c(nm, popup_vars)
     if(!is.null(width_var_name)) {
@@ -101,8 +103,6 @@ netvis = function(
   })
   names(map_list) = names_width
   # map_list[[1]]
-  map_list
-  # browser()
   i = 1
   nms = names(map_list)
   # Create layer for column 1:

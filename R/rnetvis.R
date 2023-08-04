@@ -48,7 +48,7 @@
 netvis = function(
     x,
     min_width = 1.8,
-    max_width = 10,
+    max_width = 8,
     names_width = NULL,
     width_regex = "bi|du",
     width_var_name = NULL,

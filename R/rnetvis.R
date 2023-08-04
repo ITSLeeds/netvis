@@ -15,13 +15,13 @@
 #' rnet = rnet_minimal
 #' netvis(rnet, basemaps = leaflet::providers$OpenStreetMap)
 #' # Variations in width only in bottom 30% of widest lines set to max width:
-#' netvis(rnet, global_ptile = 0.3, basemaps = leaflet::providers$OpenStreetMap)
+#' netvis(rnet, global_ptile = 0.2, basemaps = leaflet::providers$OpenStreetMap)
 #' 
 #' rnet = rnet_central
 #' # Small variations in line width:
 #' netvis(rnet, min_width = 3, max_width = 5)
 #' # Max width reached early:
-#' netvis(rnet, min_width = 3, max_width = 10, ptile = 0.1)
+#' netvis(rnet, min_width = 3, max_width = 10, global_ptile = 0.1)
 #' rnet = rnet_limerick
 #' netvis(rnet, width_regex = "Bicycle")
 #' m = netvis(rnet, width_regex = "Bicycle", output = "tmap")
@@ -85,7 +85,11 @@ netvis = function(
     # summary(x_no_outliers)
     i = 1
     for(i in seq(ncol(x_no_outliers))) {
-      max_value = quantile(x = x_no_outliers[, i], probs = ptiles[i])
+      if(i == 1) {
+        max_value = quantile(x = x_no_outliers[, i], probs = ptiles[i])
+      } else {
+        max_value = max(quantile(x = x_no_outliers[, i], probs = ptiles[i]), max_value)
+      }
       sel_too_large = x_no_outliers[, i] > max_value
       x_no_outliers[sel_too_large, i] = max_value
     }

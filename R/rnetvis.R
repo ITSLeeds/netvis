@@ -2,8 +2,9 @@
 #' Visualise route networks
 #'
 #' @param x 
-#' @param min_width 
-#' @param max_width 
+#' @param min_width Minimum width of lines
+#' @param max_width Maximum width of lines
+#' @param names_width Names of columns to use for line widths
 #' @param popup_vars Variables to appear in popups
 #'
 #' @return
@@ -12,11 +13,14 @@
 #'
 #' @examples
 #' rnet = rnet_minimal
-#' netvis(rnet)
+#' netvis(rnet, basemaps = leaflet::providers$OpenStreetMap)
+#' # Variations in width only in bottom 30% of widest lines set to max width:
+#' netvis(rnet, ptile = 0.3, basemaps = leaflet::providers$OpenStreetMap)
+#' 
 #' # Small variations in line width:
 #' netvis(rnet, min_width = 3, max_width = 5)
 #' # Max width reached early:
-#' netvis(rnet, min_width = 3, max_width = 5, ptile = 0.1)
+#' netvis(rnet, min_width = 3, max_width = 10, ptile = 0.1)
 #' rnet = rnet_limerick
 #' netvis(rnet, width_regex = "Bicycle")
 #' m = netvis(rnet, width_regex = "Bicycle", output = "tmap")
@@ -63,15 +67,12 @@ netvis = function(
   if(is.null(width_multiplier)) {
     width_multiplier = max_width / min_width
   }
-  x_no_outliers = x |>
-    sf::st_drop_geometry() |>
-    dplyr::select(matches(width_regex)) |>
-    dplyr::mutate_all(function(x) {
-      x[x > quantile(x, ptile)] = quantile(x, ptile)
-      x
-    })
+  x_no_outliers = sf::st_drop_geometry(x)[names_width]
+  x_no_outliers = as.matrix(x_no_outliers)
+  max_value = quantile(x = x_no_outliers, probs = ptile)
+  x_no_outliers[x_no_outliers > max_value] = max_value
+  x_no_outliers = tibble::as_tibble(x_no_outliers)
   # waldo::compare(x, x_no_outliers) # large values gone
-  max_value = max(x_no_outliers)
   x_normalized = x_no_outliers |>
     dplyr::mutate_all(function(x) x / max_value)
   # summary(x_normalized)

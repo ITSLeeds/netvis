@@ -90,6 +90,11 @@ central_leeds = zones_leeds |>
   sf::st_union()
 rnet_central = sf::st_intersection(rnet_leeds, central_leeds)
 # sf::st_write(rnet_central, "test-data/rnet_central.geojson", delete_dsn = TRUE)
+rnet_minimal = rnet_central |> 
+  slice_max(ebike_slc, n = 2) |>
+  mutate(across(where(is.numeric), function(x) x * 1:2))
+rnet_minimal
+usethis::use_data(rnet_minimal, overwrite = TRUE)
 ```
 
 Read in data for Leeds with the following:

@@ -11,7 +11,7 @@
 #' @export
 #'
 #' @examples
-#' rnet = rnet_central
+#' rnet = rnet_minimal
 #' netvis(rnet)
 #' # Small variations in line width:
 #' netvis(rnet, min_width = 3, max_width = 5)
@@ -45,6 +45,7 @@ netvis = function(
     x,
     min_width = 1.8,
     max_width = 10,
+    names_width = NULL,
     width_regex = "bi|du",
     width_var_name = NULL,
     output = "leaflet",
@@ -54,7 +55,9 @@ netvis = function(
     basemaps = NULL,
     ...
 ) {
-  names_width = names(x)[grepl(width_regex, names(x))]
+  if(is.null(names_width)) {
+    names_width = names(x)[grepl(width_regex, names(x))]
+  }
   names_width_lwd = paste0(names_width, "_lwd")
   names(names_width_lwd) = names_width
   if(is.null(width_multiplier)) {

@@ -15,8 +15,9 @@
 #' rnet = rnet_minimal
 #' netvis(rnet, basemaps = leaflet::providers$OpenStreetMap)
 #' # Variations in width only in bottom 30% of widest lines set to max width:
-#' netvis(rnet, ptile = 0.3, basemaps = leaflet::providers$OpenStreetMap)
+#' netvis(rnet, global_ptile = 0.3, basemaps = leaflet::providers$OpenStreetMap)
 #' 
+#' rnet = rnet_central
 #' # Small variations in line width:
 #' netvis(rnet, min_width = 3, max_width = 5)
 #' # Max width reached early:
@@ -54,7 +55,10 @@ netvis = function(
     width_var_name = NULL,
     output = "leaflet",
     width_multiplier = NULL,
-    ptile = 0.95,
+    ptile_min = 1,
+    ptile_max = 0.95,
+    ptiles = NULL,
+    global_ptile = NULL,
     popup_vars = NULL,
     basemaps = NULL,
     ...
@@ -69,8 +73,24 @@ netvis = function(
   }
   x_no_outliers = sf::st_drop_geometry(x)[names_width]
   x_no_outliers = as.matrix(x_no_outliers)
-  max_value = quantile(x = x_no_outliers, probs = ptile)
-  x_no_outliers[x_no_outliers > max_value] = max_value
+  if(!is.null(global_ptile)) {
+    max_value = quantile(x = x_no_outliers, probs = global_ptile)
+    sel_too_large = x_no_outliers > max_value
+    x_no_outliers[sel_too_large] = max_value
+  } else {
+    # browser()
+    if(is.null(ptiles)) {
+      ptiles = seq(from = ptile_min, to = ptile_max, length.out = ncol(x_no_outliers))
+    }
+    # summary(x_no_outliers)
+    i = 1
+    for(i in seq(ncol(x_no_outliers))) {
+      max_value = quantile(x = x_no_outliers[, i], probs = ptiles[i])
+      sel_too_large = x_no_outliers[, i] > max_value
+      x_no_outliers[sel_too_large, i] = max_value
+    }
+  }
+  # summary(x_no_outliers) # final columns curtailed the most
   x_no_outliers = tibble::as_tibble(x_no_outliers)
   # waldo::compare(x, x_no_outliers) # large values gone
   x_normalized = x_no_outliers |>

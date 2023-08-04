@@ -85,7 +85,7 @@ netvis = function(
   # summary(x_scaled)
   maximums = x_scaled |> sapply(max)
   max_widths = maximums * max_width
-  message("Max widths: ", max_widths)
+  message("Max widths: ", paste(round(max_widths, 2), collapse = ", "))
   names(max_widths) = names_width
   names(x_scaled) = names_width_lwd
   x_to_plot = dplyr::bind_cols(x, x_scaled)

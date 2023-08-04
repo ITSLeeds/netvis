@@ -13,9 +13,10 @@
 #' @examples
 #' rnet = rnet_central
 #' netvis(rnet)
-#' netvis(rnet, min_width = 3)
-#' # Small variations in line width
-#' netvis(rnet, min_width = 3, max_width = 10)
+#' # Small variations in line width:
+#' netvis(rnet, min_width = 3, max_width = 5)
+#' # Max width reached early:
+#' netvis(rnet, min_width = 3, max_width = 5, ptile = 0.1)
 #' rnet = rnet_limerick
 #' netvis(rnet, width_regex = "Bicycle")
 #' m = netvis(rnet, width_regex = "Bicycle", output = "tmap")
@@ -42,8 +43,8 @@
 #'    breaks = quietness_breaks, basemaps = basemaps)
 netvis = function(
     x,
-    min_width = 2,
-    max_width = 6,
+    min_width = 1.8,
+    max_width = 10,
     width_regex = "bi|du",
     width_var_name = NULL,
     output = "leaflet",

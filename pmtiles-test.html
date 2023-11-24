@@ -21,9 +21,7 @@
             let protocol = new pmtiles.Protocol();
             maplibregl.addProtocol("pmtiles",protocol.tile);
 
-            let PMTILES_URL = "https://protomaps.github.io/PMTiles/protomaps(vector)ODbL_firenze.pmtiles";
-            let PMTILES_URL2 = "rnet_limerick.pmtiles"
-
+            let PMTILES_URL = "rnet_limerick.pmtiles"
             const p = new pmtiles.PMTiles(PMTILES_URL);
 
             // this is so we share one instance across the JS code and the map renderer
@@ -42,44 +40,12 @@
                                 type: "vector",
                                 url: "pmtiles://" + PMTILES_URL,
                                 attribution: '© <a href="https://openstreetmap.org">OpenStreetMap</a>'
-                            },
-                            "example_source2": {
-                                type: "vector",
-                                url: "pmtiles://" + PMTILES_URL2,
-                                attribution: '© <a href="https://openstreetmap.org">OpenStreetMap</a>'
                             }
                         },
                         layers: [
                             {
-                                "id":"buildings",
-                                "source": "example_source",
-                                "source-layer":"landuse",
-                                "type": "fill",
-                                "paint": {
-                                    "fill-color": "steelblue"
-                                }
-                            },
-                            {
-                                "id":"roads",
-                                "source": "example_source",
-                                "source-layer":"roads",
-                                "type": "line",
-                                "paint": {
-                                    "line-color": "black"
-                                }
-                            },
-                            {
-                                "id":"mask",
-                                "source": "example_source",
-                                "source-layer":"mask",
-                                "type": "fill",
-                                "paint": {
-                                    "fill-color": "white"
-                                }
-                            },
-                            {
                                 "id":"rnet_limerick",
-                                "source": "example_source2",
+                                "source": "example_source",
                                 "source-layer":"rnet_limerick",
                                 "type": "line",
                                 "paint": {

@@ -1,0 +1,44 @@
+---
+title: Testing pmtiles
+---
+
+
+```{r}
+devtools::load_all(here::here())
+library(sf)
+```
+
+```{r}
+plot(rnet_limerick)
+sf::write_sf(rnet_limerick, "rnet_limerick.geojson")
+```
+
+Now we'll convert those to `rnet_limerick.pmtiles`:
+
+```bash
+tippecanoe -o rnet_limerick.pmtiles -zg rnet_limerick.geojson
+```
+
+Now we'll read them back in:
+
+```{r}
+library(leafem)
+library(leaflet)
+url_rivers = "https://vector-tiles-data.s3.eu-central-1.amazonaws.com/rivers_africa.pmtiles"
+leaflet() %>%
+  addTiles() %>%
+  addPMPolylines(
+    url = url_rivers
+    , layerId = "rivers"
+    , group = "rivers"
+    , style = paintRules(
+      layer = "rivers_africa"
+      , color = "blue"
+    )
+  ) %>%
+  setView(24, 2.5, 4)
+```
+
+```{r}
+if (!)
+```

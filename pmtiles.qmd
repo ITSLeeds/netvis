@@ -40,5 +40,25 @@ leaflet() %>%
 ```
 
 ```{r}
-if (!)
+f_rivers = basename(url_rivers)
+if (!file.exists(f_rivers)) {
+  download.file(url_rivers, f_rivers)
+}
+```
+
+```{r}
+u_routes = "https://itsleeds.github.io/netvis/rnet_limerick.pmtiles"
+leaflet() %>%
+  addTiles() %>%
+  addPMPolylines(
+    # url = paste0("pmtiles://", f_rivers)
+    url = u_routes
+    , layerId = "rnet_limerick"
+    # , group = "rivers"
+    , style = paintRules(
+      layer = "rnet_limerick"
+      , color = "blue"
+    )
+  ) %>%
+  setView(-5, 52, 6)
 ```

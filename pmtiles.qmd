@@ -48,11 +48,12 @@ if (!file.exists(f_rivers)) {
 
 ```{r}
 u_routes = "https://itsleeds.github.io/netvis/rnet_limerick.pmtiles"
+f_routes = basename(u_routes)
 leaflet() %>%
   addTiles() %>%
   addPMPolylines(
     # url = paste0("pmtiles://", f_rivers)
-    url = u_routes
+    url = f_routes,
     , layerId = "rnet_limerick"
     # , group = "rivers"
     , style = paintRules(
